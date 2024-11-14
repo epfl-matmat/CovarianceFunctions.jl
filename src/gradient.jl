@@ -86,7 +86,8 @@ const IsotropicGradientKernelElement{T, K, X, Y} = GradientKernelElement{T, K, X
 function LinearAlgebra.mul!(b, G::IsotropicGradientKernelElement, a, α::Number = 1, β::Number = 0) #, ::IsotropicInput = G.input_trait)
     r = difference(G.x, G.y) # other implementation appears to be faster for d = 128 since r does not have to be computed twice?
     r² = sum(abs2, r)
-    k1, k2 = derivative_laplacian(G.k, r²) # IDEA: these could be computed once and stored in G
+    T = typeof(G.k(r²)) # TODO: Addendum by Cédric to make diff work.
+    k1, k2 = derivative_laplacian(G.k, r², T) # IDEA: these could be computed once and stored in G
     dot_r_a = r'a # dot(r, a)
     @. b = α * -2(k1 * a + 2*k2 * r * dot_r_a) + β * b
 end
